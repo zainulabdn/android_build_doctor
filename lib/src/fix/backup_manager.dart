@@ -58,8 +58,9 @@ class BackupManager {
     return dirs;
   }
 
-  /// Restores the newest backup (or `which`) and returns the restored
-  /// relative paths. Returns an empty list when there is nothing to restore.
+  /// Restores the newest backup (or `which`) and returns the restored paths,
+  /// relative to the project root and written with forward slashes on every
+  /// platform. Returns an empty list when there is nothing to restore.
   List<String> restore({Directory? which, bool delete = true}) {
     final dir = which ?? list().firstOrNull;
     if (dir == null) return const [];

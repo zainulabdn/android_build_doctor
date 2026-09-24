@@ -305,7 +305,10 @@ void main() {
       target.writeAsStringSync('changed\n');
       expect(mgr.list(), hasLength(1));
       final restored = mgr.restore();
-      expect(restored, [p.join('android', 'gradle.properties')]);
+      // restore() reports what it restored, so the path is a display path:
+      // forward slashes on every platform, not p.join's native separators.
+      expect(restored, ['android/gradle.properties']);
+      expect(restored.single, isNot(contains(r'\')));
       expect(target.readAsStringSync(), original);
       expect(mgr.list(), isEmpty);
       expect(File(p.join(mgr.root, '.gitignore')).existsSync(), isTrue);
