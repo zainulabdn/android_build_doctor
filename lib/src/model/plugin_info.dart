@@ -1,3 +1,4 @@
+import '../util/paths.dart';
 import 'source_ref.dart';
 
 /// What was learned about one Flutter plugin's Android side.
@@ -111,8 +112,8 @@ class PluginInfo {
     'name': name,
     'version': version,
     'latest_version': latestVersion,
-    'root': rootPath,
-    'build_file': buildFile,
+    'root': toPosixPath(rootPath),
+    'build_file': buildFile == null ? null : toPosixPath(buildFile!),
     'applies_kgp': appliesKgp,
     'kgp_ref': kgpRef?.toJson(),
     'namespace': namespace,

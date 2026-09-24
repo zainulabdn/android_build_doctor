@@ -1,4 +1,4 @@
-import 'package:path/path.dart' as p;
+import '../util/paths.dart';
 
 import '../fix/backup_manager.dart';
 import 'base_command.dart';
@@ -31,7 +31,7 @@ class RestoreCommand extends BaseCommand {
         out('No backups in android/${BackupManager.dirName}/.');
       }
       for (final b in backups) {
-        out(p.relative(b.path, from: dir));
+        out(relativeForDisplay(b.path, from: dir));
       }
       return exitOk;
     }

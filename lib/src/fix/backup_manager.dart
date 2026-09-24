@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import '../util/paths.dart';
+
 /// Copies files into `android/.android_build_doctor_backup/<timestamp>/`
 /// before they are changed, and restores the most recent backup.
 class BackupManager {
@@ -73,7 +75,7 @@ class BackupManager {
       final dest = File(p.join(projectDir, rel));
       dest.parent.createSync(recursive: true);
       src.copySync(dest.path);
-      restored.add(rel);
+      restored.add(toPosixPath(rel));
     }
     if (delete) dir.deleteSync(recursive: true);
     return restored;

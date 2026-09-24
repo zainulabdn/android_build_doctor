@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../model/source_ref.dart';
+import 'paths.dart';
 
 /// A text file split into lines, with helpers for line-oriented regex
 /// searches that report 1-based line numbers.
@@ -22,9 +23,9 @@ class TextFile {
     } on FileSystemException {
       return null;
     }
-    final display = relativeTo == null
-        ? path
-        : p.relative(path, from: relativeTo);
+    final display = toPosixPath(
+      relativeTo == null ? path : p.relative(path, from: relativeTo),
+    );
     return TextFile(path, content, displayPath: display);
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import '../explain/explainer.dart';
+import '../model/severity.dart';
 import '../output/json_reporter.dart';
 import '../version.dart';
 import 'base_command.dart';
@@ -73,7 +74,9 @@ class ExplainCommand extends BaseCommand {
       return exitOk;
     }
     for (final e in result.explanations) {
-      out('${ansi.red('✗')} ${ansi.bold('${e.id}  ${e.title}')}');
+      out(
+        '${reporter.symbolFor(Severity.error)} ${ansi.bold('${e.id}  ${e.title}')}',
+      );
       if (e.culprit != null) {
         out(
           '  ${ansi.dim('culprit:')} ${e.culprit!.isApp ? 'your app module' : e.culprit!.label}'

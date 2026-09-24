@@ -6,6 +6,7 @@ import '../matrix/compat_matrix.dart';
 import '../model/finding.dart';
 import '../model/project_snapshot.dart';
 import '../model/source_ref.dart';
+import '../util/paths.dart';
 import '../util/versions.dart';
 import 'file_edit.dart';
 
@@ -73,8 +74,11 @@ class FixPlanner {
   /// Flutter release being targeted.
   final FlutterRelease? release;
 
-  String _abs(SourceRef ref) =>
-      p.isAbsolute(ref.file) ? ref.file : p.join(snapshot.projectDir, ref.file);
+  String _abs(SourceRef ref) {
+    // Report paths use forward slashes; the filesystem wants native ones.
+    final native = toNativePath(ref.file);
+    return p.isAbsolute(native) ? native : p.join(snapshot.projectDir, native);
+  }
 
   bool _has(String id) => findings.any((f) => f.id == id);
 

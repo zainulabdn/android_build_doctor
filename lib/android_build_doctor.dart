@@ -47,6 +47,7 @@ export 'src/output/ansi.dart';
 export 'src/output/console_reporter.dart';
 export 'src/output/json_reporter.dart';
 export 'src/rules/rules.dart';
+export 'src/util/paths.dart';
 export 'src/util/process.dart';
 export 'src/util/text_file.dart';
 export 'src/util/versions.dart';

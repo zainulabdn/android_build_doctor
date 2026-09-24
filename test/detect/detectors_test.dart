@@ -251,10 +251,7 @@ android {
     test('CI java-version', () {
       final ci = CiDetector.detect(project('declarative_groovy'));
       expect(ci.single.value, 21);
-      expect(
-        ci.single.source!.file,
-        p.join('.github', 'workflows', 'build.yml'),
-      );
+      expect(ci.single.source!.file, '.github/workflows/build.yml');
     });
 
     test('FVM config', () {

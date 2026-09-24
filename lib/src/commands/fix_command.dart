@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
+import '../util/paths.dart';
 
 import '../fix/backup_manager.dart';
 import '../fix/diff_printer.dart';
@@ -79,7 +79,7 @@ class FixCommand extends BaseCommand {
           ? File(e.key).readAsStringSync()
           : '';
       diffs[e.key] = printer.unified(
-        p.relative(e.key, from: snapshot.projectDir),
+        relativeForDisplay(e.key, from: snapshot.projectDir),
         before,
         e.value,
       );
@@ -95,7 +95,7 @@ class FixCommand extends BaseCommand {
           'plan': plan.toJson(),
           'diff': {
             for (final e in diffs.entries)
-              p.relative(e.key, from: snapshot.projectDir): e.value,
+              relativeForDisplay(e.key, from: snapshot.projectDir): e.value,
           },
           'applied': false,
         }),
@@ -168,7 +168,7 @@ class FixCommand extends BaseCommand {
       out(
         ansi.green('Applied.') +
             ansi.dim(
-              ' Backup: ${p.relative(backup, from: snapshot.projectDir)}'
+              ' Backup: ${relativeForDisplay(backup, from: snapshot.projectDir)}'
               ' (undo with `android_build_doctor restore`)',
             ),
       );
