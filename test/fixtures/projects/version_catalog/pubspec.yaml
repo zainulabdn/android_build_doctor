@@ -1,0 +1,8 @@
+name: version_catalog
+description: Fixture that declares AGP and KGP through gradle/libs.versions.toml.
+version: 1.0.0+1
+environment:
+  sdk: ^3.8.0
+dependencies:
+  flutter:
+    sdk: flutter

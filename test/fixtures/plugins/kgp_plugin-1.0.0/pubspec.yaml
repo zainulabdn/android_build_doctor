@@ -1,0 +1,8 @@
+name: kgp_plugin
+version: 1.0.0
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.example.kgp_plugin
+        pluginClass: KgpPlugin

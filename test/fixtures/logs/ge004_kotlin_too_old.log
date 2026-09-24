@@ -1,0 +1,8 @@
+Running Gradle task 'assembleDebug'...
+┌─ Flutter Fix ────────────────────────────────────────────────────────────────────────────────────┐
+│ [!] Your project requires a newer version of the Kotlin Gradle plugin.                           │
+│ Find the latest version on https://kotlinlang.org/docs/releases.html#release-details, then update │
+│ /Users/dev/my_app/android/build.gradle:                                                          │
+│ ext.kotlin_version = '<latest-version>'                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Exception: Gradle task assembleDebug failed with exit code 1

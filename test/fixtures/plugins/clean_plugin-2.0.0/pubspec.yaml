@@ -1,0 +1,10 @@
+name: clean_plugin
+version: 2.0.0
+environment:
+  flutter: ">=3.44.0"
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.example.clean_plugin
+        pluginClass: CleanPlugin

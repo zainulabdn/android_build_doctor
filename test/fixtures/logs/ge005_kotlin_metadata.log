@@ -1,0 +1,15 @@
+Running Gradle task 'assembleDebug'...
+e: /Users/dev/.gradle/caches/transforms-3/abc123/transformed/jetified-kotlin-stdlib-2.1.0.jar!/META-INF/kotlin-stdlib.kotlin_module: Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 2.1.0, expected version is 1.8.0.
+e: /Users/dev/.gradle/caches/transforms-3/def456/transformed/jetified-lifecycle-common-2.8.0.jar!/META-INF/lifecycle-common.kotlin_module: Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 2.1.0, expected version is 1.8.0.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':geocoding_android:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 41s

@@ -1,0 +1,215 @@
+# Compatibility matrix for android_build_doctor.
+#
+# This is DATA, not code. Every number here was taken from the sources listed
+# below on the `updated` date. Rows that were derived rather than read verbatim
+# carry a "# derived:" note; anything unconfirmed carries "# TODO verify".
+# If you find a wrong entry, please open an issue or a pull request:
+#   https://github.com/zainulabdn/android_build_doctor/issues
+#
+# Flutter "verified" rows are the versions Flutter's own project template ships
+# with for that release (packages/flutter_tools/lib/src/android/gradle_utils.dart
+# at the release tag). "minimums" and "warn_below" are the thresholds Flutter's
+# Gradle plugin enforces at build time (DependencyVersionChecker.kt at the tag):
+# below "minimums" the Flutter Gradle plugin fails the build, below
+# "warn_below" it prints a deprecation warning.
+
+schema_version: 1
+updated: 2026-09-24
+latest_flutter: "3.47"
+
+sources:
+  - https://flutter.dev/blog/whats-new-in-flutter-3-47
+  - https://flutter.dev/blog/whats-new-in-flutter-3-44
+  - https://flutter.dev/blog/whats-new-in-flutter-3-38
+  - https://github.com/flutter/flutter/blob/3.47.0/packages/flutter_tools/lib/src/android/gradle_utils.dart
+  - https://github.com/flutter/flutter/blob/3.47.0/packages/flutter_tools/gradle/src/main/kotlin/DependencyVersionChecker.kt
+  - https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin
+  - https://docs.gradle.org/current/userguide/compatibility.html
+  - https://developer.android.com/build/releases/gradle-plugin
+  - https://developer.android.com/build/releases/past-releases
+
+flutter:
+  "3.47":
+    verified: { java: "17", kgp: "2.4.0", agp: "9.1.0", gradle: "9.3.1" }
+    minimums: { java: "17", gradle: "8.14.0", agp: "8.11.1", kgp: "2.2.20" }
+    warn_below: { gradle: "9.1.0", agp: "9.0.1", kgp: "2.3.20" }
+    max_known: { agp: "9.2", gradle: "9.3.1", kgp: "2.4.0" }
+    defaults: { compileSdk: 36, targetSdk: 36, minSdk: 24, ndk: "28.2.13676358" }
+    builtin_kotlin:
+      supported: true        # android.builtInKotlin=true allowed once app + plugins migrated
+      legacy_kgp_flag: true  # android.builtInKotlin=false still works
+    # Newest AGP 8 combination that Flutter itself shipped (the 3.41 template)
+    # and that satisfies this release's "minimums". Used by `fix` when plugins
+    # are not ready for AGP 9.
+    agp8_combo: { agp: "8.11.1", gradle: "8.14", kgp: "2.2.20" }
+  "3.44":
+    verified: { java: "17", kgp: "2.3.20", agp: "9.0.1", gradle: "9.1.0" }
+    minimums: { java: "17", gradle: "8.7.0", agp: "8.6.0", kgp: "2.0.0" }
+    warn_below: { gradle: "8.14.0", agp: "8.11.1", kgp: "2.2.20" }
+    max_known: { agp: "9.1", gradle: "9.3.1", kgp: "2.3.20" }
+    defaults: { compileSdk: 36, targetSdk: 36, minSdk: 24, ndk: "28.2.13676358" }
+    builtin_kotlin:
+      supported: false       # builtInKotlin=true not supported until 3.47
+      legacy_kgp_flag: true  # 3.44 introduced android.builtInKotlin=false
+    agp8_combo: { agp: "8.11.1", gradle: "8.14", kgp: "2.2.20" }
+  "3.41":
+    verified: { java: "17", kgp: "2.2.20", agp: "8.11.1", gradle: "8.14" }
+    minimums: { java: "17", gradle: "8.3.0", agp: "8.1.1", kgp: "1.8.10" }
+    warn_below: { gradle: "8.7.0", agp: "8.6.0", kgp: "2.1.0" }
+    max_known: { agp: "9.0", gradle: "9.1.0", kgp: "2.2.20" }
+    # Flutter 3.41 release post: "Do not update your Flutter app for Android to AGP 9".
+    max_recommended_agp: "8"
+    defaults: { compileSdk: 36, targetSdk: 36, minSdk: 24, ndk: "28.2.13676358" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.38":
+    verified: { java: "17", kgp: "2.2.20", agp: "8.11.1", gradle: "8.14" }
+    minimums: { java: "17", gradle: "8.3.0", agp: "8.1.1", kgp: "1.8.10" }
+    warn_below: { gradle: "8.7.0", agp: "8.6.0", kgp: "2.1.0" }
+    max_known: { agp: "9.0", gradle: "9.1.0", kgp: "2.2.20" }
+    max_recommended_agp: "8"
+    defaults: { compileSdk: 36, targetSdk: 36, minSdk: 24, ndk: "28.2.13676358" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.35":
+    verified: { java: "17", kgp: "2.1.0", agp: "8.9.1", gradle: "8.12" }
+    minimums: { java: "11", gradle: "8.3.0", agp: "8.1.1", kgp: "1.8.10" }
+    warn_below: { java: "17", gradle: "8.7.0", agp: "8.6.0", kgp: "2.1.0" }
+    max_known: { agp: "8.9.1", gradle: "8.12", kgp: "2.1.20" }
+    defaults: { compileSdk: 36, targetSdk: 36, minSdk: 24, ndk: "27.0.12077973" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.32":
+    # verified.java derived: the template AGP (8.7.3) requires JDK 17.
+    verified: { java: "17", kgp: "2.1.0", agp: "8.7.3", gradle: "8.12" }
+    minimums: { gradle: "7.0.2", agp: "7.0.0", kgp: "1.7.0" }
+    warn_below: { java: "11", gradle: "7.4.2", agp: "8.3.0", kgp: "1.8.10" }
+    max_known: { agp: "8.7.3", gradle: "8.12" }
+    defaults: { compileSdk: 35, targetSdk: 35, minSdk: 21, ndk: "26.1.10909125" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.29":
+    verified: { java: "17", kgp: "1.8.22", agp: "8.7.0", gradle: "8.10.2" }  # java derived from AGP 8.x
+    # derived: 3.27 and 3.32 enforce the same thresholds, so 3.29 does too.
+    minimums: { gradle: "7.0.2", agp: "7.0.0", kgp: "1.7.0" }
+    warn_below: { java: "11", gradle: "7.1.0", agp: "7.0.1", kgp: "1.7.10" }  # TODO verify (3.27 values)
+    max_known: { agp: "8.7.1", gradle: "8.10.2" }
+    defaults: { compileSdk: 35, targetSdk: 35, minSdk: 21, ndk: "26.1.10909125" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.27":
+    verified: { java: "17", kgp: "1.8.22", agp: "8.1.0", gradle: "8.3" }  # java derived from AGP 8.x
+    minimums: { gradle: "7.0.2", agp: "7.0.0", kgp: "1.7.0" }
+    warn_below: { java: "11", gradle: "7.1.0", agp: "7.0.1", kgp: "1.7.10" }
+    max_known: { agp: "8.5", gradle: "8.7" }
+    defaults: { compileSdk: 35, targetSdk: 35, minSdk: 21, ndk: "26.1.10909125" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.24":
+    verified: { java: "11", kgp: "1.7.10", agp: "7.3.0", gradle: "7.6.3" }  # java derived from AGP 7.x
+    minimums: { gradle: "7.0.2", agp: "7.0.0", kgp: "1.7.0" }
+    warn_below: { java: "11", gradle: "7.1.0", agp: "7.0.1", kgp: "1.7.10" }
+    max_known: { agp: "8.3", gradle: "8.0.2" }
+    defaults: { compileSdk: 34, targetSdk: 34, minSdk: 21, ndk: "23.1.7779620" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.22":
+    verified: { java: "11", kgp: "1.7.10", agp: "7.3.0", gradle: "7.6.3" }  # java derived from AGP 7.x
+    max_known: { agp: "8.3", gradle: "8.0.2" }
+    defaults: { compileSdk: 34, targetSdk: 34, minSdk: 21, ndk: "23.1.7779620" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.19":
+    verified: { java: "11", kgp: "1.7.10", agp: "7.3.0", gradle: "7.6.3" }  # java derived from AGP 7.x
+    max_known: { agp: "8.3", gradle: "8.0.2" }
+    defaults: { compileSdk: 34, targetSdk: 33, minSdk: 19, ndk: "23.1.7779620" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+  "3.16":
+    verified: { java: "11", kgp: "1.7.10", agp: "7.3.0", gradle: "7.5" }  # java derived from AGP 7.x
+    max_known: { agp: "8.3", gradle: "8.0.2" }
+    defaults: { compileSdk: 33, targetSdk: 33, minSdk: 19, ndk: "23.1.7779620" }
+    builtin_kotlin: { supported: false, legacy_kgp_flag: false }
+
+# AGP release series -> minimum Gradle and minimum JDK.
+# Source: developer.android.com/build/releases/gradle-plugin (+ past-releases).
+agp:
+  - { series: "9.4", min_gradle: "9.6.0", min_jdk: 17 }
+  - { series: "9.3", min_gradle: "9.5.0", min_jdk: 17 }
+  - { series: "9.2", min_gradle: "9.4.1", min_jdk: 17 }
+  - { series: "9.1", min_gradle: "9.3.1", min_jdk: 17 }
+  - { series: "9.0", min_gradle: "9.1.0", min_jdk: 17 }
+  - { series: "8.13", min_gradle: "8.13", min_jdk: 17 }
+  - { series: "8.12", min_gradle: "8.13", min_jdk: 17 }  # derived: 8.11 and 8.13 both require 8.13
+  - { series: "8.11", min_gradle: "8.13", min_jdk: 17 }
+  - { series: "8.10", min_gradle: "8.11.1", min_jdk: 17 }
+  - { series: "8.9", min_gradle: "8.11.1", min_jdk: 17 }
+  - { series: "8.8", min_gradle: "8.10.2", min_jdk: 17 }
+  - { series: "8.7", min_gradle: "8.9", min_jdk: 17 }
+  - { series: "8.6", min_gradle: "8.7", min_jdk: 17 }
+  - { series: "8.5", min_gradle: "8.7", min_jdk: 17 }
+  - { series: "8.4", min_gradle: "8.6", min_jdk: 17 }
+  - { series: "8.3", min_gradle: "8.4", min_jdk: 17 }
+  - { series: "8.2", min_gradle: "8.2", min_jdk: 17 }
+  - { series: "8.1", min_gradle: "8.0", min_jdk: 17 }
+  - { series: "8.0", min_gradle: "8.0", min_jdk: 17 }
+  - { series: "7.4", min_gradle: "7.5", min_jdk: 11 }
+  - { series: "7.3", min_gradle: "7.4", min_jdk: 11 }
+  - { series: "7.2", min_gradle: "7.3.3", min_jdk: 11 }
+  - { series: "7.1", min_gradle: "7.2", min_jdk: 11 }
+  - { series: "7.0", min_gradle: "7.0", min_jdk: 11 }
+  - { series: "4.2", min_gradle: "6.7.1", min_jdk: 8 }  # TODO verify
+  - { series: "4.1", min_gradle: "6.5", min_jdk: 8 }    # TODO verify
+  - { series: "4.0", min_gradle: "6.1.1", min_jdk: 8 }  # TODO verify
+
+# AGP features that matter for rules.
+agp_features:
+  namespace_required_from: "8.0"      # `namespace` mandatory in build files
+  builtin_kotlin_from: "9.0"          # AGP has Kotlin built in; kotlin-android conflicts
+  builtin_kotlin_runtime_kgp: "2.2.10" # AGP 9.0/9.1 runtime KGP dependency
+
+# Gradle version -> the newest Java it can RUN on (docs.gradle.org compatibility).
+# Look-up: take the newest row whose Gradle version is <= yours.
+gradle_max_java:
+  - { gradle: "9.4.0", java: 26 }
+  - { gradle: "9.1.0", java: 25 }
+  - { gradle: "8.14", java: 24 }
+  - { gradle: "8.10", java: 23 }
+  - { gradle: "8.8", java: 22 }
+  - { gradle: "8.5", java: 21 }
+  - { gradle: "8.3", java: 20 }
+  - { gradle: "7.6", java: 19 }
+  - { gradle: "7.5", java: 18 }
+  - { gradle: "7.3", java: 17 }
+  - { gradle: "7.0", java: 16 }
+  - { gradle: "6.7", java: 15 }
+  - { gradle: "6.3", java: 14 }
+  - { gradle: "6.0", java: 13 }
+  - { gradle: "5.4", java: 12 }
+  - { gradle: "5.0", java: 11 }
+  - { gradle: "4.7", java: 10 }
+  - { gradle: "4.3", java: 9 }
+  - { gradle: "2.0", java: 8 }
+
+# Gradle version -> the oldest Java it can RUN on.
+gradle_min_java:
+  - { gradle: "9.0", java: 17 }
+  - { gradle: "5.0", java: 8 }
+
+# Class-file major version -> Java version (major = java + 44).
+java_class_versions:
+  52: "8"
+  53: "9"
+  54: "10"
+  55: "11"
+  56: "12"
+  57: "13"
+  58: "14"
+  59: "15"
+  60: "16"
+  61: "17"
+  62: "18"
+  63: "19"
+  64: "20"
+  65: "21"
+  66: "22"
+  67: "23"
+  68: "24"
+  69: "25"
+  70: "26"
+
+# Thresholds for the plugin audit (GP004).
+plugin_audit:
+  compile_sdk_lag: 2   # warn when a plugin hard-codes compileSdk < (Flutter default - lag)
+  java_below: 11       # warn when a plugin targets Java < 11

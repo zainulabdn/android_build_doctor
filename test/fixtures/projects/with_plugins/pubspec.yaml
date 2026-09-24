@@ -1,0 +1,12 @@
+name: with_plugins
+description: Fixture whose dependency tree contains three fake plugins.
+version: 1.0.0+1
+environment:
+  sdk: ^3.13.0
+dependencies:
+  flutter:
+    sdk: flutter
+  kgp_plugin: ^1.0.0
+  clean_plugin: ^2.0.0
+dev_dependencies:
+  no_namespace_plugin: ^0.5.0

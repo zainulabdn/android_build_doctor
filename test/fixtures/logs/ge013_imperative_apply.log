@@ -1,0 +1,7 @@
+Running Gradle task 'assembleDebug'...
+You are applying Flutter's main Gradle plugin imperatively using the apply script method, which is deprecated and will be removed in a future release. Migrate to applying Gradle plugins with the declarative plugins block: https://flutter.dev/to/flutter-gradle-plugin-apply
+
+You are applying Flutter's app_plugin_loader Gradle plugin imperatively using the apply script method, which is deprecated and will be removed in a future release. Migrate to applying Gradle plugins with the declarative plugins block: https://flutter.dev/to/flutter-gradle-plugin-apply
+
+Running Gradle task 'assembleDebug'...                             45.1s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk

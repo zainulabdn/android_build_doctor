@@ -1,0 +1,38 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "clean_plugin",
+      "rootUri": "../../../plugins/clean_plugin-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.12"
+    },
+    {
+      "name": "kgp_plugin",
+      "rootUri": "../../../plugins/kgp_plugin-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "no_namespace_plugin",
+      "rootUri": "../../../plugins/no_namespace_plugin-0.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "path",
+      "rootUri": "../../../plugins/path-1.9.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "with_plugins",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "3.13"
+    }
+  ],
+  "generated": "2026-09-24T00:00:00.000000Z",
+  "generator": "pub",
+  "generatorVersion": "3.13.0"
+}

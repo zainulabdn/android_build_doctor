@@ -1,0 +1,30 @@
+name: android_build_doctor
+description: >-
+  Flutter Android build doctor: checks Java/Gradle/AGP/Kotlin compatibility,
+  audits every plugin for AGP 9 blockers, explains Gradle errors, applies safe fixes.
+version: 0.1.0
+repository: https://github.com/zainulabdn/android_build_doctor
+issue_tracker: https://github.com/zainulabdn/android_build_doctor/issues
+topics:
+  - android
+  - gradle
+  - cli
+  - build
+  - kotlin
+
+environment:
+  sdk: ^3.8.0
+
+executables:
+  android_build_doctor: android_build_doctor
+
+dependencies:
+  args: ^2.7.0
+  http: ^1.4.0
+  path: ^1.9.1
+  pub_semver: ^2.2.0
+  yaml: ^3.1.3
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0

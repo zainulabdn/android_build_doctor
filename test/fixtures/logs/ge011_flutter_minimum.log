@@ -1,0 +1,20 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file '/Users/dev/my_app/android/app/build.gradle.kts' line: 1
+
+* What went wrong:
+An exception occurred applying plugin request [id: 'dev.flutter.flutter-gradle-plugin']
+> Failed to apply plugin 'dev.flutter.flutter-gradle-plugin'.
+   > Error: Your project's Gradle version (8.3.0) is lower than Flutter's minimum supported version of 8.14.0. Please upgrade your Gradle version.
+     Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+     Potential fix: Your project's gradle version is typically defined in the gradle wrapper file. By default, this can be found at /Users/dev/my_app/android/gradle/wrapper/gradle-wrapper.properties.
+     For more information, see https://docs.gradle.org/current/userguide/gradle_wrapper.html.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 2s

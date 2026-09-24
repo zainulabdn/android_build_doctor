@@ -1,0 +1,8 @@
+name: agp9_legacy_flag
+description: Fixture based on the Flutter 3.47 template.
+version: 1.0.0+1
+environment:
+  sdk: ^3.13.0
+dependencies:
+  flutter:
+    sdk: flutter

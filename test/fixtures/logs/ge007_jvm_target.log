@@ -1,0 +1,15 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugKotlin'.
+> Inconsistent JVM-target compatibility detected for tasks 'compileDebugJavaWithJavac' (1.8) and 'compileDebugKotlin' (17).
+
+  Consider using JVM Toolchain: https://kotl.in/gradle/jvm/toolchain
+  Learn more about JVM-target validation: https://kotl.in/gradle/jvm/target-validation
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 12s

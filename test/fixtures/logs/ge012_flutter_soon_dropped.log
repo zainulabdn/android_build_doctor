@@ -1,0 +1,11 @@
+Running Gradle task 'assembleDebug'...
+Warning: Flutter support for your project's Android Gradle Plugin version (8.6.0) will soon be dropped. Please upgrade your Android Gradle Plugin version to a version of at least 9.0.1 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's AGP version is typically defined in the plugins block of the `settings.gradle` file (/Users/dev/my_app/android/settings.gradle), by a plugin with the id of com.android.application.
+Alternatively, if your project was created with an older version of the templates, it is likely
+in the top-level build.gradle file (/Users/dev/my_app/android/build.gradle) by the following line:
+    classpath 'com.android.tools.build:gradle:<version>'
+
+Running Gradle task 'assembleDebug'...                            103.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk

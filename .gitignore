@@ -1,0 +1,15 @@
+.dart_tool/
+.packages
+build/
+pubspec.lock
+coverage/
+*.iml
+.idea/
+.vscode/
+
+# Fixtures deliberately ship these files.
+!test/fixtures/**/.dart_tool/
+!test/fixtures/**/pubspec.lock
+
+# macOS
+.DS_Store

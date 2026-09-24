@@ -1,0 +1,14 @@
+Running Gradle task 'assembleDebug'...
+/Users/dev/my_app/android/app/src/main/AndroidManifest.xml Error:
+	uses-sdk:minSdkVersion 19 cannot be smaller than version 21 declared in library [:google_maps_flutter_android] /Users/dev/my_app/build/google_maps_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml as the library might be using APIs not available in 19
+	Suggestion: use a compatible library with a minSdk of at most 19,
+		or increase this project's minSdk version to at least 21,
+		or use tools:overrideLibrary="io.flutter.plugins.googlemaps" to force usage (may lead to runtime failures)
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:processDebugMainManifest'.
+> Manifest merger failed : uses-sdk:minSdkVersion 19 cannot be smaller than version 21 declared in library [:google_maps_flutter_android] /Users/dev/my_app/build/google_maps_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml as the library might be using APIs not available in 19
+
+BUILD FAILED in 8s

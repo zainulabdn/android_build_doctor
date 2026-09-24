@@ -1,0 +1,12 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  exclude:
+    - test/fixtures/**
+
+linter:
+  rules:
+    - public_member_api_docs
+    - prefer_single_quotes
+    - unawaited_futures
+    - avoid_print

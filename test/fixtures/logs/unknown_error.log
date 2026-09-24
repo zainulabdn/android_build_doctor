@@ -1,0 +1,14 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:mergeDebugResources'.
+> A failure occurred while executing com.android.build.gradle.internal.res.ResourceCompilerRunnable
+   > Resource compilation failed (Failed to compile values resource file /Users/dev/my_app/build/app/intermediates/incremental/debug/mergeDebugResources/merged.dir/values/values.xml. Cause: javax.xml.stream.XMLStreamException: ParseError at [row,col]:[3,5]
+     Message: The processing instruction target matching "[xX][mM][lL]" is not allowed.). Check logs for more details.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 7s

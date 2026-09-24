@@ -1,0 +1,8 @@
+name: old_groovy
+description: Fixture created with a Flutter 3.10-era template.
+version: 1.0.0+1
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter

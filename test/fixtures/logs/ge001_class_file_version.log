@@ -1,0 +1,21 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file '/Users/dev/projects/my_app/android/build.gradle' line: 1
+
+* What went wrong:
+A problem occurred evaluating root project 'android'.
+> Could not open cp_settings generic class cache for settings file '/Users/dev/projects/my_app/android/settings.gradle' (/Users/dev/.gradle/caches/7.6.3/scripts/2h1jqu9z0m7zyzsnhqf6z8n7d).
+   > BUG! exception in phase 'semantic analysis' in source unit '_BuildScript_' Unsupported class file major version 65
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 1s
+Error: Gradle task assembleDebug failed with exit code 1

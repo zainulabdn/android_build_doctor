@@ -1,0 +1,18 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:mergeDebugNativeLibs'.
+> Could not resolve all files for configuration ':app:debugRuntimeClasspath'.
+   > Could not resolve com.github.sarxos:webcam-capture:0.3.12.
+     Required by:
+         project :app > project :old_camera_plugin
+      > Could not resolve com.github.sarxos:webcam-capture:0.3.12.
+         > Could not get resource 'https://jcenter.bintray.com/com/github/sarxos/webcam-capture/0.3.12/webcam-capture-0.3.12.pom'.
+            > Could not GET 'https://jcenter.bintray.com/com/github/sarxos/webcam-capture/0.3.12/webcam-capture-0.3.12.pom'. Received status code 403 from server: Forbidden
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 9s

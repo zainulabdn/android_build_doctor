@@ -1,0 +1,21 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file '/Users/dev/.pub-cache/hosted/pub.dev/file_picker-10.3.8/android/build.gradle' line: 24
+
+* What went wrong:
+A problem occurred evaluating project ':file_picker'.
+> Failed to apply plugin 'org.jetbrains.kotlin.android'.
+   > Cannot add extension with name 'kotlin', as there is an extension already registered with that name.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 4s
+Error: Gradle task assembleDebug failed with exit code 1

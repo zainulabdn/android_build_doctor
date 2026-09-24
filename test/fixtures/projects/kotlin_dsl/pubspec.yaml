@@ -1,0 +1,8 @@
+name: kotlin_dsl
+description: Fixture using Kotlin DSL build scripts (Flutter 3.32-era template).
+version: 1.0.0+1
+environment:
+  sdk: ^3.8.0
+dependencies:
+  flutter:
+    sdk: flutter

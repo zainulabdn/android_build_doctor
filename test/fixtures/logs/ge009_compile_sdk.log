@@ -1,0 +1,22 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:checkDebugAarMetadata'.
+> A failure occurred while executing com.android.build.gradle.internal.tasks.CheckAarMetadataWorkAction
+   > An issue was found when checking AAR metadata:
+
+       1.  Dependency 'androidx.core:core:1.13.1' requires libraries and applications that
+           depend on it to compile against version 34 or later of the
+           Android APIs.
+
+           :app is currently compiled against android-33.
+
+           Recommended action: Update this project to use a newer compileSdk
+           of at least 34, for example 34.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 6s

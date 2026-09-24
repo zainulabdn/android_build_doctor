@@ -1,0 +1,14 @@
+Running Gradle task 'assembleDebug'...
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring project ':app'.
+> The Android Gradle plugin supports only Kotlin Gradle plugin version 1.5.20 and higher.
+  The following dependencies do not satisfy the required version:
+  project ':app' -> org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+
+BUILD FAILED in 1s
