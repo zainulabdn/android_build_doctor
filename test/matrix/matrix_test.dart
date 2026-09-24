@@ -14,19 +14,19 @@ void main() {
     test('embedded YAML matches data/ files (run tool/embed_data.dart)', () {
       final pkg = packageRoot();
       expect(
-        bundledMatrixYaml,
-        File(p.join(pkg, 'data', 'matrix.yaml')).readAsStringSync(),
+        lf(bundledMatrixYaml),
+        lf(File(p.join(pkg, 'data', 'matrix.yaml')).readAsStringSync()),
       );
       expect(
-        bundledErrorsYaml,
-        File(p.join(pkg, 'data', 'errors.yaml')).readAsStringSync(),
+        lf(bundledErrorsYaml),
+        lf(File(p.join(pkg, 'data', 'errors.yaml')).readAsStringSync()),
       );
     });
 
     test('package version constant matches pubspec.yaml', () {
       final pkg = packageRoot();
       final pubspec = File(p.join(pkg, 'pubspec.yaml')).readAsStringSync();
-      expect(pubspec, contains('version: $packageVersion\n'));
+      expect(lf(pubspec), contains('version: $packageVersion\n'));
     });
   });
 
@@ -102,6 +102,22 @@ void main() {
       expect(m.updated, '2027-01-01');
       expect(File(p.join(tmp.path, 'matrix.yaml')).existsSync(), isTrue);
 
+      final again = await MatrixLoader(
+        client: client,
+        cacheDir: tmp.path,
+      ).load();
+      expect(again.source, 'cache');
+    });
+
+    test('prefers remote over bundled when the dates are equal', () async {
+      final client = MockClient(
+        (_) async => http.Response(bundledMatrixYaml, 200),
+      );
+      final m = await MatrixLoader(client: client, cacheDir: tmp.path).load();
+      expect(m.source, 'remote');
+      expect(m.updated, matrix.updated);
+
+      // And the cache is preferred over bundled on the next run.
       final again = await MatrixLoader(
         client: client,
         cacheDir: tmp.path,

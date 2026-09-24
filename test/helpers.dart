@@ -13,6 +13,9 @@ String fixture(String sub) {
   return p.normalize(p.join(dir, 'test', 'fixtures', sub));
 }
 
+/// Normalises CRLF to LF so byte-exact expectations hold on Windows.
+String lf(String s) => s.replaceAll('\r\n', '\n');
+
 /// Absolute path of the package root.
 String packageRoot() => p.dirname(p.dirname(fixture('')));
 

@@ -116,6 +116,10 @@ Global flags:
 | `--project <dir>` | Project directory (default: current). |
 | `--verbose` / `-v` | Show docs links, detection notes and matrix loading details. |
 
+The matrix cache lives in `~/.android_build_doctor/`. Set
+`ANDROID_BUILD_DOCTOR_CACHE_DIR` to relocate it, which is useful in CI where
+you may want it inside the workspace cache.
+
 Exit codes: `0` OK or warnings only, `1` errors found, `2` tool failure (not a Flutter project, bad input).
 
 ### What `check` looks for

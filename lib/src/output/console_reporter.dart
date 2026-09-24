@@ -27,6 +27,10 @@ class ConsoleReporter {
   String get _unknown => unicode ? '?' : '??';
   String get _bullet => unicode ? '•' : '*';
 
+  /// Symbol for a severity (`null` means "no problem"), honouring the
+  /// [unicode] setting so `--ci` and Windows get an ASCII fallback.
+  String symbolFor(Severity? s) => _sym(s);
+
   String _sym(Severity? s) => switch (s) {
     null => ansi.green(_ok),
     Severity.error => ansi.red(_err),

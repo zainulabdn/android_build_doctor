@@ -47,9 +47,15 @@ class MatrixLoader {
   CompatMatrix get bundled =>
       CompatMatrix.parse(_bundledYaml, source: 'bundled');
 
+  /// Environment variable that overrides [cacheDirectory]. Useful in tests
+  /// and in CI, where the matrix cache must not leak between runs.
+  static const String cacheDirEnvVar = 'ANDROID_BUILD_DOCTOR_CACHE_DIR';
+
   /// Directory where the remote copy is cached.
   String get cacheDirectory {
     if (_cacheDir != null) return _cacheDir;
+    final override = Platform.environment[cacheDirEnvVar];
+    if (override != null && override.isNotEmpty) return override;
     final home =
         Platform.environment['HOME'] ??
         Platform.environment['USERPROFILE'] ??
@@ -72,13 +78,25 @@ class MatrixLoader {
       if (remote != null) candidates.add(remote);
     }
 
-    candidates.sort((a, b) => Versions.compare(_dateKey(b), _dateKey(a)));
+    // Freshest date wins. On a tie the remote copy is preferred over the
+    // cache, and both over the bundled fallback: they are at least as fresh,
+    // and the report footer should show that remote updating is working.
+    candidates.sort((a, b) {
+      final byDate = Versions.compare(_dateKey(b), _dateKey(a));
+      return byDate != 0 ? byDate : _sourceRank(a).compareTo(_sourceRank(b));
+    });
     final chosen = candidates.first;
     notes.add('using ${chosen.source} matrix dated ${chosen.updated}');
     return chosen;
   }
 
   static String _dateKey(CompatMatrix m) => m.updated.replaceAll('-', '.');
+
+  static int _sourceRank(CompatMatrix m) => switch (m.source) {
+    'remote' => 0,
+    'cache' => 1,
+    _ => 2,
+  };
 
   CompatMatrix? _readCache({required bool allowStale}) {
     final f = _cacheFile;

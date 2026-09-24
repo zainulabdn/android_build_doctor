@@ -190,7 +190,7 @@ void main() {
           p.join(tmp.path, 'android', 'app', 'build.gradle'),
         ).readAsStringSync();
         expect(
-          app,
+          lf(app),
           contains(
             'android {\n    namespace "com.example.old_groovy"\n    compileSdkVersion 33',
           ),
@@ -213,17 +213,15 @@ void main() {
         tmp = copyFixture('with_plugins');
         // Adjust relative package_config paths: copy plugins next to the temp dir.
         final pluginsSrc = Directory(fixture('plugins'));
-        final pluginsDst = Directory(
-          p.join(p.dirname(p.dirname(tmp.path)), 'plugins'),
-        );
         final cfg = File(p.join(tmp.path, '.dart_tool', 'package_config.json'));
+        // Directory.uri yields file:///... with a trailing slash. A raw Windows
+        // path here would put backslashes into JSON, which are invalid escapes.
         cfg.writeAsStringSync(
           cfg.readAsStringSync().replaceAll(
             '../../../plugins/',
-            '${pluginsSrc.path}/',
+            pluginsSrc.uri.toString(),
           ),
         );
-        expect(pluginsDst.existsSync() || true, isTrue);
         final (s, fs) = await detect(tmp.path, flutter: '3.47.0', java: 17);
         expect(s.kgpPlugins.map((e) => e.name), ['kgp_plugin']);
         final plan = planFor(s, fs);
@@ -244,7 +242,7 @@ void main() {
         p.join(tmp.path, 'android', 'gradle.properties'),
       ).readAsStringSync();
       expect(
-        props,
+        lf(props),
         endsWith('android.useAndroidX=true\nandroid.builtInKotlin=false\n'),
       );
       final (_, fs2) = await detect(tmp.path, flutter: '3.47.0', java: 17);

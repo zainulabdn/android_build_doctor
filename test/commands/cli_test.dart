@@ -1,21 +1,39 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:android_build_doctor/android_build_doctor.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import '../helpers.dart';
 
+/// Isolated matrix cache, so the CLI under test never reads or writes the
+/// developer's real ~/.android_build_doctor directory and results never depend
+/// on whether an earlier run left a cached copy behind.
+final Directory _cacheDir = Directory.systemTemp.createTempSync(
+  'abd_cli_cache',
+);
+
+Map<String, String> get _env => {
+  ...Platform.environment,
+  MatrixLoader.cacheDirEnvVar: _cacheDir.path,
+};
+
 Future<ProcessResult> cli(List<String> args, {String? cwd}) {
   final pkg = packageRoot();
-  return Process.run(Platform.resolvedExecutable, [
-    'run',
-    p.join(pkg, 'bin', 'android_build_doctor.dart'),
-    '--offline',
-    '--no-commands',
-    '--no-color',
-    ...args,
-  ], workingDirectory: cwd ?? pkg);
+  return Process.run(
+    Platform.resolvedExecutable,
+    [
+      'run',
+      p.join(pkg, 'bin', 'android_build_doctor.dart'),
+      '--offline',
+      '--no-commands',
+      '--no-color',
+      ...args,
+    ],
+    workingDirectory: cwd ?? pkg,
+    environment: _env,
+  );
 }
 
 void main() {
@@ -84,6 +102,19 @@ void main() {
     );
   });
 
+  test('plugins --ci uses ASCII symbols too', () async {
+    final r = await cli([
+      '--ci',
+      '--project',
+      project('with_plugins'),
+      'plugins',
+    ]);
+    expect(r.exitCode, 1);
+    expect(r.stdout, contains('XX no_namespace_plugin'));
+    expect(r.stdout, isNot(contains('\u2717')));
+    expect(r.stdout, isNot(contains('\u26a0')));
+  });
+
   test('plugins asks for pub get when .dart_tool is missing', () async {
     final r = await cli(['--project', project('old_groovy'), 'plugins']);
     expect(r.exitCode, 2);
@@ -92,14 +123,19 @@ void main() {
 
   test('explain reads stdin with -', () async {
     final pkg = packageRoot();
-    final proc = await Process.start(Platform.resolvedExecutable, [
-      'run',
-      p.join(pkg, 'bin', 'android_build_doctor.dart'),
-      '--offline',
-      '--no-color',
-      'explain',
-      '-',
-    ], workingDirectory: pkg);
+    final proc = await Process.start(
+      Platform.resolvedExecutable,
+      [
+        'run',
+        p.join(pkg, 'bin', 'android_build_doctor.dart'),
+        '--offline',
+        '--no-color',
+        'explain',
+        '-',
+      ],
+      workingDirectory: pkg,
+      environment: _env,
+    );
     proc.stdin.write(
       File(
         p.join(fixture('logs'), 'ge002_kotlin_extension.log'),

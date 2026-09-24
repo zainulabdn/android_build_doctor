@@ -102,12 +102,7 @@ class PluginsCommand extends BaseCommand {
       final fs = byPlugin[p.name] ?? const [];
       if (fs.isEmpty && !showAll) continue;
       final worst = fs.isEmpty ? null : fs.first.severity;
-      final sym = switch (worst) {
-        null => ansi.green('✓'),
-        Severity.error => ansi.red('✗'),
-        Severity.warning => ansi.yellow('⚠'),
-        Severity.info => ansi.blue('ℹ'),
-      };
+      final sym = reporter.symbolFor(worst);
       final latest =
           p.latestVersion != null &&
               p.version != null &&
