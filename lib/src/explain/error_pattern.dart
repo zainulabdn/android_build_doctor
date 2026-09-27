@@ -2,6 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../data/bundled_data.dart';
 import '../matrix/compat_matrix.dart';
+import '../model/severity.dart';
 
 /// One entry of `data/errors.yaml`.
 class ErrorPattern {
@@ -14,6 +15,7 @@ class ErrorPattern {
     required this.fix,
     this.docs,
     this.derive = const {},
+    this.severity = Severity.error,
   });
 
   /// Stable id such as `GE001`.
@@ -36,6 +38,10 @@ class ErrorPattern {
 
   /// Derived placeholders: name → (capture group, matrix map name).
   final Map<String, ({int from, String map})> derive;
+
+  /// How serious the matched message is. Most patterns are build failures;
+  /// deprecation notices from a build that still succeeded are warnings.
+  final Severity severity;
 
   /// Parses every pattern in `yamlText` (defaults to the bundled file).
   static List<ErrorPattern> loadAll([String? yamlText]) {
@@ -71,6 +77,10 @@ class ErrorPattern {
               : [fix.toString().trim()],
           docs: node['docs']?.toString(),
           derive: derive,
+          severity: Severity.values.firstWhere(
+            (v) => v.name == node['severity']?.toString(),
+            orElse: () => Severity.error,
+          ),
         ),
       );
     }

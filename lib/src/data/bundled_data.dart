@@ -239,6 +239,8 @@ const String bundledErrorsYaml = r'''
 #   cause   Plain-language explanation.
 #   fix     Steps, one per list item.
 #   docs    URL with more information.
+#   severity  Optional: error (default) or warning, for notices printed by a
+#           build that still succeeded.
 #
 # Keep regexes anchored to distinctive text so they do not fire on unrelated
 # logs. Test every pattern against a real log in test/fixtures/logs/.
@@ -376,6 +378,7 @@ patterns:
     docs: https://docs.flutter.dev/release/breaking-changes/android-java-gradle-migration-guide
 
   - id: GE012
+    severity: warning
     regex: "Flutter support for your project's (Gradle|Java|Android Gradle Plugin|Kotlin) version \\(([^)]+)\\) will soon be dropped"
     title: Flutter warns that your {1} version is about to lose support
     cause: >-
@@ -386,6 +389,7 @@ patterns:
     docs: https://docs.flutter.dev/release/breaking-changes/android-java-gradle-migration-guide
 
   - id: GE013
+    severity: warning
     regex: 'You are applying Flutter''s (?:main|app_plugin_loader) Gradle plugin imperatively'
     title: Deprecated imperative apply of Flutter's Gradle plugin
     cause: >-

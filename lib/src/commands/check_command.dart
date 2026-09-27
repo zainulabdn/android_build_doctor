@@ -25,7 +25,7 @@ class CheckCommand extends BaseCommand {
       'matrix and print a report. Changes nothing.';
 
   @override
-  Future<int> run() async {
+  Future<int> execute() async {
     final matrix = await loadMatrix();
     final snapshot = await detectProject(scanPlugins: true);
     if (snapshot == null) return exitOk;

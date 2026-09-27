@@ -2,7 +2,7 @@ name: android_build_doctor
 description: >-
   Flutter Android build doctor: checks Java/Gradle/AGP/Kotlin compatibility,
   audits every plugin for AGP 9 blockers, explains Gradle errors, applies safe fixes.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/zainulabdn/android_build_doctor
 issue_tracker: https://github.com/zainulabdn/android_build_doctor/issues
 topics:
@@ -11,6 +11,24 @@ topics:
   - cli
   - build
   - kotlin
+
+screenshots:
+  - description: >-
+      check: every Java, Gradle, AGP and Kotlin version compared with what your
+      Flutter release was verified with, each problem with its file and fix.
+    path: doc/screenshots/check.webp
+  - description: >-
+      plugins: the AGP 9 readiness of every plugin in your dependency tree, and
+      exactly which ones block built-in Kotlin.
+    path: doc/screenshots/plugins.webp
+  - description: >-
+      explain: a failed Gradle build explained in plain language, with the
+      plugin that caused it and numbered fix steps.
+    path: doc/screenshots/explain.webp
+  - description: >-
+      fix: a plan and a line-numbered diff for every file, a backup before
+      anything changes, and restore to undo it.
+    path: doc/screenshots/fix.webp
 
 environment:
   sdk: ^3.8.0

@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
+import '../output/ansi.dart';
+import '../output/glyphs.dart';
 import '../version.dart';
 import 'base_command.dart';
 import 'check_command.dart';
@@ -73,8 +76,9 @@ class AndroidBuildDoctorRunner extends CommandRunner<int> {
 
   @override
   Future<int> run(Iterable<String> args) async {
+    ArgResults? results;
     try {
-      final results = parse(args);
+      results = parse(args);
       if (results['version'] == true) {
         stdout.writeln('android_build_doctor $packageVersion');
         return exitOk;
@@ -86,8 +90,25 @@ class AndroidBuildDoctorRunner extends CommandRunner<int> {
       stderr.writeln(e.usage);
       return exitFailure;
     } on ToolExit catch (e) {
-      stderr.writeln('android_build_doctor: ${e.message}');
+      stderr.writeln(_failure(e.message, results));
       return e.code;
     }
+  }
+
+  /// A failure line for stderr: a red `✗` on an interactive terminal, the
+  /// plain `android_build_doctor:` prefix in logs and with `--ci`.
+  static String _failure(String message, ArgResults? results) {
+    final plain =
+        results?['ci'] == true ||
+        results?['color'] == false ||
+        Platform.isWindows ||
+        Ansi.detectDepth(
+              Platform.environment,
+              isTerminal: stderr.hasTerminal && stderr.supportsAnsiEscapes,
+            ) ==
+            ColorDepth.none;
+    if (plain) return 'android_build_doctor: $message';
+    final ansi = Ansi(enabled: true);
+    return ' ${ansi.fg(Tones.error, Glyphs.unicode.error)} $message';
   }
 }

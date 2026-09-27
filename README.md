@@ -1,28 +1,21 @@
-# android_build_doctor
+[![android_build_doctor: the AGP 9 era build doctor for Flutter](https://raw.githubusercontent.com/zainulabdn/android_build_doctor/main/doc/banner.webp)](https://pub.dev/packages/android_build_doctor)
+
+[![pub package](https://img.shields.io/pub/v/android_build_doctor.svg?label=pub.dev&color=2a78d6)](https://pub.dev/packages/android_build_doctor)
+[![pub points](https://img.shields.io/pub/points/android_build_doctor?color=0ca30c)](https://pub.dev/packages/android_build_doctor/score)
+[![CI](https://github.com/zainulabdn/android_build_doctor/actions/workflows/ci.yml/badge.svg)](https://github.com/zainulabdn/android_build_doctor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/zainulabdn/android_build_doctor/blob/main/LICENSE)
 
 **The AGP 9 era build doctor for Flutter.** It checks your app *and every
 plugin you depend on*, tells you exactly who is blocking your upgrade,
 explains Gradle errors in plain language, and fixes what it safely can.
 
+```bash
+dart pub global activate android_build_doctor
+cd my_flutter_app
+android_build_doctor check
 ```
-$ android_build_doctor check
 
-android_build_doctor 0.1.0 • matrix 2026-09-24 (remote)
-
-Project: my_app   Flutter 3.47.1 • Dart 3.13.0
-
-  Java            21       ✓  (min 17)
-  Gradle          8.7      ✗  AGP 9.1.0 needs Gradle >= 9.3.1, but the wrapper uses Gradle 8.7.  android/gradle/wrapper/gradle-wrapper.properties:5
-  AGP             9.1.0    ✓  (verified 9.1.0)
-  Kotlin          2.1.0    ⚠  Kotlin Gradle Plugin 2.1.0 is older than the 2.4.0 that Flutter 3.47 was verified with.  android/settings.gradle.kts:24
-  Built-in Kotlin unset    ✗  AGP 9.1.0 has Kotlin built in, but android/app applies kotlin-android  android/app/build.gradle.kts:4
-  SDK levels               ✓  compile flutter.compileSdkVersion  target flutter.targetSdkVersion  min flutter.minSdkVersion
-
-✗ 2 errors  ⚠ 1 warning
-
-Run `android_build_doctor fix` to fix 3 of 3 automatically.
-Run `android_build_doctor plugins` to check if your plugins are AGP 9 ready.
-```
+![android_build_doctor check: a toolchain panel with Java, Gradle, AGP, Kotlin, built-in Kotlin and SDK levels, each problem with its file, line and fix, and a summary card with the next command to run](https://raw.githubusercontent.com/zainulabdn/android_build_doctor/main/doc/screenshots/check.webp)
 
 ## Why this exists
 
@@ -55,50 +48,53 @@ does not do: plugins, explanations, fixes and CI.
 
 ## Quick start
 
+Install it globally (make sure `~/.pub-cache/bin` is on your `PATH`):
+
 ```bash
 dart pub global activate android_build_doctor
-cd my_flutter_app
-android_build_doctor check
 ```
 
-Or as a dev dependency:
+Or add it to your project as a dev dependency:
 
 ```bash
 flutter pub add --dev android_build_doctor
 dart run android_build_doctor check
 ```
 
-## The plugin readiness report
+## See who is blocking AGP 9
 
+`android_build_doctor plugins` reads every plugin in your dependency tree and
+shows how many are ready for AGP 9 with built-in Kotlin, which ones block you,
+and whether a newer release is on pub.dev. Plugins with errors come first.
+
+![android_build_doctor plugins: an AGP 9 readiness meter at 38 of 40 plugins, the two blockers, and each problem plugin with its findings](https://raw.githubusercontent.com/zainulabdn/android_build_doctor/main/doc/screenshots/plugins.webp)
+
+## Understand a failed build
+
+Pipe a failed build into `explain`. It names the pattern, the plugin or module
+that caused it, why it happened, and the steps to fix it.
+
+```bash
+flutter build apk 2>&1 | android_build_doctor explain -
 ```
-$ android_build_doctor plugins
 
-android_build_doctor 0.1.0 • matrix 2026-09-24 (remote)
+![android_build_doctor explain: the Kotlin plugin applied twice on AGP 9, blamed on file_picker 10.3.8, with the cause and four numbered fix steps](https://raw.githubusercontent.com/zainulabdn/android_build_doctor/main/doc/screenshots/explain.webp)
 
-Project: my_app   AGP 9.1.0 • android.builtInKotlin=false
-40 plugin(s) with an Android module found in .dart_tool/package_config.json
+## Fix it, safely
 
-⚠ file_picker 10.3.8  (latest 10.4.1)
-    GP001 file_picker 10.3.8 still applies the Kotlin Gradle Plugin. It blocks enabling built-in Kotlin (AGP 9).
-    GP005 file_picker 10.3.8 -> 10.4.1 is available on pub.dev.
-⚠ geocoding_android 3.3.0
-    GP001 geocoding_android 3.3.0 still applies the Kotlin Gradle Plugin. It blocks enabling built-in Kotlin (AGP 9).
-✗ some_old_plugin 0.2.1
-    GP002 some_old_plugin 0.2.1 declares no namespace in its build.gradle. AGP 8+ fails with "Namespace not specified".
+`fix` shows its plan and a line-numbered diff for every file, asks before
+writing, backs every file up first, and `restore` undoes it.
 
-✗ 1 error  ⚠ 2 warnings
-
-AGP 9 + built-in Kotlin readiness: 37/40 plugins ready. Blockers: file_picker, geocoding_android, some_old_plugin.
-```
+![android_build_doctor fix: a plan of three edits, the diff for each file, advice about plugins, and the applied result with the backup location](https://raw.githubusercontent.com/zainulabdn/android_build_doctor/main/doc/screenshots/fix.webp)
 
 ## Commands
 
 | Command | What it does |
 |---|---|
 | `android_build_doctor check` | Read every version, compare with the matrix, print a report. Changes nothing. |
-| `android_build_doctor plugins` | Scan every plugin in the dependency tree for AGP 9 / built-in Kotlin blockers, missing namespaces, `jcenter()` and old settings. Ends with the readiness verdict. |
-| `android_build_doctor fix` | Apply safe fixes. Shows a unified diff, asks `Apply these changes? (y/N)`, always backs files up first. |
-| `android_build_doctor fix --dry-run` | Show the diff only. |
+| `android_build_doctor plugins` | Scan every plugin in the dependency tree for AGP 9 / built-in Kotlin blockers, missing namespaces, `jcenter()` and old settings. Shows the readiness meter. |
+| `android_build_doctor fix` | Apply safe fixes. Shows the plan and a diff, asks `Apply these changes? (y/N)`, always backs files up first. |
+| `android_build_doctor fix --dry-run` | Show the plan and the diff only. |
 | `android_build_doctor fix --yes --verify` | Apply without asking, then run `flutter clean && flutter build apk --debug`. |
 | `android_build_doctor restore` | Undo the last `fix` from `android/.android_build_doctor_backup/`. |
 | `android_build_doctor explain <log>` | Explain a failed build log. `-` reads stdin: `flutter build apk 2>&1 \| android_build_doctor explain -` |
@@ -115,6 +111,7 @@ Global flags:
 | `--flutter-version <x.y.z>` | Assume this Flutter version instead of running `flutter --version`. |
 | `--project <dir>` | Project directory (default: current). |
 | `--verbose` / `-v` | Show docs links, detection notes and matrix loading details. |
+| `--no-color` | Plain text, no colours. |
 
 The matrix cache lives in `~/.android_build_doctor/`. Set
 `ANDROID_BUILD_DOCTOR_CACHE_DIR` to relocate it, which is useful in CI where
@@ -188,6 +185,20 @@ first, the diff is shown, edits change only the exact lines involved (comments,
 quotes and indentation elsewhere are untouched), a dirty git tree triggers a
 warning, and `android_build_doctor restore` undoes the last run.
 
+## Output that reads well everywhere
+
+- **Light and dark terminals.** The status colours were checked with the WCAG
+  contrast formula against white, Solarized Light and four dark themes, and keep
+  at least 3:1 on all of them. Text stays in your terminal's own colours; colour
+  only marks symbols, badges, borders and meters, always next to a symbol or a
+  word.
+- **Your terminal's colour depth.** 24-bit, 256 and 16 colours are detected from
+  `COLORTERM`, `TERM`, `TERM_PROGRAM` and `WT_SESSION`. `NO_COLOR` turns colour
+  off and `FORCE_COLOR` (`1`, `2`, `3`) turns it on, for example when piping into
+  `less -R`.
+- **Logs stay clean.** `--ci` and Windows consoles get plain ASCII. The progress
+  spinner only appears on an interactive terminal and never in `--json` output.
+
 ## CI usage
 
 ```yaml
@@ -200,16 +211,18 @@ warning, and `android_build_doctor restore` undoes the last run.
 ```
 
 `--json` output has the shape `{ "versions": {...}, "findings": [{ "id", "severity", "file", "line", "message", "fix", "docs" }], "summary": {...} }`.
+`fix --json` prints one document with the plan, the diffs and, with `--yes`,
+the backup location; without `--yes` it applies nothing.
 
 ## The compatibility matrix
 
-All version knowledge lives in [`data/matrix.yaml`](data/matrix.yaml), not in
+All version knowledge lives in [`data/matrix.yaml`](https://github.com/zainulabdn/android_build_doctor/blob/main/data/matrix.yaml), not in
 code. Every number cites its source (Flutter's release posts and the
 `flutter_tools` source at each release tag, Gradle's compatibility page, AGP
 release notes). On each run the tool fetches the latest copy from this
 repository (3 second timeout, cached for 24 hours) and falls back to the
 bundled copy, so a new Flutter release only needs a data update, not a new
-package version. The report footer always shows the matrix date and source.
+package version. The report header always shows the matrix date and source.
 
 Spotted a wrong entry? Please [open an issue](https://github.com/zainulabdn/android_build_doctor/issues).
 
@@ -222,7 +235,7 @@ Gradle files. Install it with `dart run skills@ get`.
 
 ## Contributing: add an error pattern in 5 minutes
 
-Patterns live in [`data/errors.yaml`](data/errors.yaml). Add an entry:
+Patterns live in [`data/errors.yaml`](https://github.com/zainulabdn/android_build_doctor/blob/main/data/errors.yaml). Add an entry:
 
 ```yaml
   - id: GE016
@@ -233,11 +246,15 @@ Patterns live in [`data/errors.yaml`](data/errors.yaml). Add an entry:
       - Step one.
       - Step two.
     docs: https://link.to/docs
+    severity: warning   # optional; only for notices from a build that succeeded
 ```
 
 Then drop a real log in `test/fixtures/logs/ge016_something.log`, run
 `dart run tool/embed_data.dart` and `dart test`. The test suite checks that
 every pattern matches its fixture and nothing else.
+
+The screenshots above are the real output, rendered by
+`dart run tool/screenshots.dart` (needs `rsvg-convert` and `cwebp`: `brew install librsvg webp`).
 
 ## Using it as a library
 

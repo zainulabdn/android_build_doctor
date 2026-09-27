@@ -1,4 +1,5 @@
 import '../matrix/compat_matrix.dart';
+import '../model/severity.dart';
 import 'error_pattern.dart';
 
 /// A matched pattern with its placeholders filled in.
@@ -12,10 +13,14 @@ class Explanation {
     this.docs,
     this.excerpt,
     this.culprit,
+    this.severity = Severity.error,
   });
 
   /// Pattern id.
   final String id;
+
+  /// How serious the matched message is.
+  final Severity severity;
 
   /// Filled title.
   final String title;
@@ -38,6 +43,7 @@ class Explanation {
   /// JSON representation.
   Map<String, Object?> toJson() => {
     'id': id,
+    'severity': severity.label,
     'title': title,
     'cause': cause,
     'fix': fix,
@@ -155,6 +161,7 @@ class Explainer {
           cause: p.fill(p.cause, m, matrix),
           fix: [for (final f in p.fix) p.fill(f, m, matrix)],
           docs: p.docs,
+          severity: p.severity,
           excerpt: _lineAround(text, m.start),
           culprit: _culpritNear(text, m.start),
         ),

@@ -36,6 +36,9 @@ Future<ProcessResult> cli(List<String> args, {String? cwd}) {
   );
 }
 
+/// True when every character of `s` is plain ASCII.
+bool isAscii(Object? s) => s.toString().codeUnits.every((c) => c < 128);
+
 void main() {
   test('--version', () async {
     final r = await cli(['--version']);
@@ -89,17 +92,18 @@ void main() {
       'check',
     ]);
     expect(r.exitCode, 1);
-    expect(r.stdout, isNot(contains('✗')));
-    expect(r.stdout, contains('XX'));
+    expect(isAscii(r.stdout), isTrue, reason: r.stdout.toString());
+    expect(r.stdout, contains('+- Toolchain -'));
+    expect(r.stdout, contains(' ERROR  GD016'));
+    expect(r.stdout, isNot(contains('\x1B[')));
   });
 
   test('plugins prints the readiness verdict', () async {
     final r = await cli(['--project', project('with_plugins'), 'plugins']);
     expect(r.exitCode, 1);
-    expect(
-      r.stdout,
-      contains('readiness: 2/3 plugins ready. Blockers: kgp_plugin.'),
-    );
+    expect(r.stdout, contains('AGP 9 readiness'));
+    expect(r.stdout, contains('2/3 ready'));
+    expect(r.stdout, contains('1 blocker: kgp_plugin'));
   });
 
   test('plugins --ci uses ASCII symbols too', () async {
@@ -110,9 +114,9 @@ void main() {
       'plugins',
     ]);
     expect(r.exitCode, 1);
-    expect(r.stdout, contains('XX no_namespace_plugin'));
-    expect(r.stdout, isNot(contains('\u2717')));
-    expect(r.stdout, isNot(contains('\u26a0')));
+    expect(r.stdout, contains(' x no_namespace_plugin 0.5.0'));
+    expect(r.stdout, contains(' ! kgp_plugin 1.0.0'));
+    expect(isAscii(r.stdout), isTrue, reason: r.stdout.toString());
   });
 
   test('plugins asks for pub get when .dart_tool is missing', () async {
@@ -218,6 +222,44 @@ void main() {
     final restore = await cli(['--project', tmp.path, 'restore']);
     expect(restore.exitCode, 0, reason: restore.stderr.toString());
     expect(wrapper.readAsStringSync(), before);
+  });
+
+  test('fix --json prints one document and applies only with --yes', () async {
+    final tmp = copyFixture('version_catalog');
+    addTearDown(() => tmp.deleteSync(recursive: true));
+    final wrapper = File(
+      p.join(
+        tmp.path,
+        'android',
+        'gradle',
+        'wrapper',
+        'gradle-wrapper.properties',
+      ),
+    );
+    final before = wrapper.readAsStringSync();
+    final args = [
+      '--json',
+      '--flutter-version',
+      '3.47.0',
+      '--project',
+      tmp.path,
+    ];
+
+    final asked = await cli([...args, 'fix']);
+    expect(asked.exitCode, 0, reason: asked.stderr.toString());
+    final plan = jsonDecode(asked.stdout.toString()) as Map<String, Object?>;
+    expect(plan['applied'], isFalse);
+    expect(plan.containsKey('backup'), isFalse);
+    expect(plan['diff'].toString(), isNot(contains('\x1B[')));
+    expect(wrapper.readAsStringSync(), before);
+
+    final applied = await cli([...args, 'fix', '--yes']);
+    expect(applied.exitCode, 0, reason: applied.stderr.toString());
+    final result =
+        jsonDecode(applied.stdout.toString()) as Map<String, Object?>;
+    expect(result['applied'], isTrue);
+    expect(result['backup'], contains('.android_build_doctor_backup'));
+    expect(wrapper.readAsStringSync(), isNot(before));
   });
 
   test('matrix prints source and date', () async {

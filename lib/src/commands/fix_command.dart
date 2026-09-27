@@ -1,14 +1,15 @@
 import 'dart:io';
 
-import '../util/paths.dart';
-
 import '../fix/backup_manager.dart';
 import '../fix/diff_printer.dart';
 import '../fix/file_edit.dart';
 import '../fix/fix_planner.dart';
 import '../model/severity.dart';
+import '../output/ansi.dart';
+import '../output/fix_reporter.dart';
 import '../output/json_reporter.dart';
 import '../rules/rules.dart';
+import '../util/paths.dart';
 import '../util/process.dart';
 import '../version.dart';
 import 'base_command.dart';
@@ -48,9 +49,10 @@ class FixCommand extends BaseCommand {
       'for confirmation and backs files up first.';
 
   @override
-  Future<int> run() async {
+  Future<int> execute() async {
     final dryRun = argResults!['dry-run'] == true;
     final yes = argResults!['yes'] == true || ci;
+    final verify = argResults!['verify'] == true;
     final matrix = await loadMatrix();
     final snapshot = await detectProject(scanPlugins: true);
     if (snapshot == null) return exitOk;
@@ -72,20 +74,25 @@ class FixCommand extends BaseCommand {
     ).plan();
 
     final preview = EditApplier.preview(plan.edits);
-    final diffs = <String, String>{};
-    final printer = DiffPrinter(ansi);
-    for (final e in preview.entries) {
-      final before = File(e.key).existsSync()
-          ? File(e.key).readAsStringSync()
-          : '';
-      diffs[e.key] = printer.unified(
-        relativeForDisplay(e.key, from: snapshot.projectDir),
-        before,
-        e.value,
-      );
-    }
+    final before = {
+      for (final path in preview.keys)
+        path: File(path).existsSync() ? File(path).readAsStringSync() : '',
+    };
+    String display(String path) =>
+        relativeForDisplay(path, from: snapshot.projectDir);
 
     if (jsonOutput) {
+      // One JSON document, whatever happens. Without --yes nothing is
+      // applied: a machine reader cannot answer the confirmation question.
+      final apply = yes && !dryRun && !plan.isEmpty;
+      final backup = apply
+          ? BackupManager(snapshot.projectDir).backup(preview.keys)
+          : null;
+      if (apply) EditApplier.write(preview);
+      final verification = apply && verify
+          ? await _verifyQuietly(snapshot.projectDir)
+          : null;
+      final plain = DiffPrinter(Ansi(enabled: false));
       out(
         JsonReporter.encode({
           'tool': 'android_build_doctor',
@@ -94,93 +101,69 @@ class FixCommand extends BaseCommand {
           'dry_run': dryRun,
           'plan': plan.toJson(),
           'diff': {
-            for (final e in diffs.entries)
-              relativeForDisplay(e.key, from: snapshot.projectDir): e.value,
+            for (final e in preview.entries)
+              display(e.key): plain.unified(
+                display(e.key),
+                before[e.key]!,
+                e.value,
+              ),
           },
-          'applied': false,
+          'applied': apply,
+          if (backup != null) 'backup': toPosixPath(backup),
+          'verify': ?verification,
         }),
       );
-      if (dryRun || plan.isEmpty) return exitOk;
-    } else {
-      reporter.header(packageVersion, matrix);
-      out('');
-      for (final r in plan.rationale) {
-        out(ansi.dim('• $r'));
-      }
-      out('');
-      if (plan.isEmpty) {
-        out(ansi.green('Nothing to fix automatically.'));
-        final remaining = findings
-            .where((f) => f.severity != Severity.info)
-            .length;
-        if (remaining > 0) {
-          out(
-            '$remaining finding(s) need manual work; see `android_build_doctor check`.',
-          );
-        }
-        for (final a in plan.advice) {
-          out('${ansi.yellow('advice:')} $a');
-        }
-        return exitOk;
-      }
-      for (final d in diffs.values) {
-        out(d);
-      }
-      out(
-        '${plan.edits.length} edit(s) in ${diffs.length} file(s) addressing '
-        '${plan.findingIds.join(', ')}.',
-      );
-      for (final a in plan.advice) {
-        out('${ansi.yellow('advice:')} $a');
-      }
-      if (dryRun) {
-        out('');
-        out(ansi.dim('--dry-run: nothing written.'));
-        return exitOk;
-      }
+      final failed = (verification?['exit_code'] ?? 0) != 0;
+      return failed ? exitErrors : exitOk;
     }
 
-    // Safety: warn about a dirty git tree.
+    final report = FixReporter(painter);
+    reporter.header(packageVersion, matrix);
+    out('');
+    if (plan.isEmpty) {
+      report.nothingToFix(
+        remaining: findings.where((f) => f.severity != Severity.info).length,
+      );
+      report.advice(plan.advice);
+      return exitOk;
+    }
+    report.plan(plan, files: preview.length);
+    for (final e in preview.entries) {
+      report.diff(display(e.key), before[e.key]!, e.value);
+    }
+    report.advice(plan.advice);
+    report.summary(plan, dryRun: dryRun);
+    if (dryRun) {
+      report.dryRun();
+      return exitOk;
+    }
+
     if (!yes) {
-      final dirty = await _gitDirty(snapshot.projectDir);
-      if (dirty) {
-        out(
-          ansi.yellow(
-            'Warning: android/ has uncommitted changes. A backup will '
-            'be made in android/${BackupManager.dirName}/ anyway.',
-          ),
+      if (await _gitDirty(snapshot.projectDir)) {
+        painter.wrapped(
+          ' ${painter.symbol(Severity.warning)} ',
+          'android/ has uncommitted changes. A backup is made in '
+              'android/${BackupManager.dirName}/ anyway.',
         );
       }
-      stdout.write('Apply these changes? (y/N) ');
+      spinner.stop();
+      stdout.write(report.prompt);
       final answer = stdin.readLineSync()?.trim().toLowerCase();
       if (answer != 'y' && answer != 'yes') {
-        out('Aborted. Nothing written.');
+        report.aborted();
         return exitOk;
       }
     }
 
     final backup = BackupManager(snapshot.projectDir).backup(preview.keys);
     EditApplier.write(preview);
-    if (jsonOutput) {
-      out(JsonReporter.encode({'applied': true, 'backup': backup}));
-    } else {
-      out('');
-      out(
-        ansi.green('Applied.') +
-            ansi.dim(
-              ' Backup: ${relativeForDisplay(backup, from: snapshot.projectDir)}'
-              ' (undo with `android_build_doctor restore`)',
-            ),
-      );
-      out('Next: run `flutter clean && flutter build apk --debug` to verify.');
-      if (plan.temporaryKgpFlag) {
-        out(ansi.yellow('Reminder: android.builtInKotlin=false is temporary.'));
-      }
-    }
-
-    if (argResults!['verify'] == true) {
-      return await _verify(snapshot.projectDir);
-    }
+    report.applied(
+      edits: plan.edits.length,
+      files: preview.length,
+      backup: display(backup),
+      temporaryKgpFlag: plan.temporaryKgpFlag,
+    );
+    if (verify) return await _verify(snapshot.projectDir, report);
     return exitOk;
   }
 
@@ -195,12 +178,12 @@ class FixCommand extends BaseCommand {
     return r.stdout.toString().trim().isNotEmpty;
   }
 
-  Future<int> _verify(String dir) async {
-    out('');
-    out(ansi.bold('Verifying: flutter clean && flutter build apk --debug'));
-    final flutter = Platform.isWindows ? 'flutter.bat' : 'flutter';
+  String get _flutter => Platform.isWindows ? 'flutter.bat' : 'flutter';
+
+  Future<int> _verify(String dir, FixReporter report) async {
+    report.verifying();
     final clean = await Process.run(
-      flutter,
+      _flutter,
       ['clean'],
       workingDirectory: dir,
       runInShell: Platform.isWindows,
@@ -210,21 +193,37 @@ class FixCommand extends BaseCommand {
       return exitErrors;
     }
     final build = await Process.start(
-      flutter,
+      _flutter,
       ['build', 'apk', '--debug'],
       workingDirectory: dir,
       runInShell: Platform.isWindows,
       mode: ProcessStartMode.inheritStdio,
     );
     final code = await build.exitCode;
-    out(
-      code == 0
-          ? ansi.green('Build succeeded.')
-          : ansi.red(
-              'Build failed (exit $code). Pipe the log into '
-              '`android_build_doctor explain -` for a diagnosis.',
-            ),
-    );
+    report.verified(code);
     return code == 0 ? exitOk : exitErrors;
+  }
+
+  /// `--verify` for `--json`: the build output is captured, not shown, so
+  /// the JSON document stays the only thing on stdout.
+  Future<Map<String, Object?>> _verifyQuietly(String dir) async {
+    for (final args in [
+      ['clean'],
+      ['build', 'apk', '--debug'],
+    ]) {
+      final r = await Process.run(
+        _flutter,
+        args,
+        workingDirectory: dir,
+        runInShell: Platform.isWindows,
+      );
+      if (r.exitCode != 0 || args.length > 1) {
+        return {
+          'command': 'flutter ${args.join(' ')}',
+          'exit_code': r.exitCode,
+        };
+      }
+    }
+    return const {};
   }
 }

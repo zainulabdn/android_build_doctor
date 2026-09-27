@@ -1,5 +1,7 @@
 # android_build_doctor examples
 
+![android_build_doctor check](https://raw.githubusercontent.com/zainulabdn/android_build_doctor/main/doc/screenshots/check.webp)
+
 ## Diagnose a project
 
 ```bash
@@ -11,13 +13,23 @@ android_build_doctor check
 
 ```bash
 android_build_doctor plugins
-# AGP 9 + built-in Kotlin readiness: 37/40 plugins ready. Blockers: file_picker, geocoding, some_old_plugin.
+# ╭─ AGP 9 readiness ────────────────────────────────────────╮
+# │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━── 38/40 ready │
+# │ ▲ 2 blockers: file_picker, geocoding_android             │
+# ╰──────────────────────────────────────────────────────────╯
 ```
 
 ## Explain a failed build
 
 ```bash
 flutter build apk 2>&1 | android_build_doctor explain -
+```
+
+## Plain output for logs
+
+```bash
+android_build_doctor check --ci      # ASCII only, no colour, no prompts
+NO_COLOR=1 android_build_doctor check
 ```
 
 ## Preview and apply fixes

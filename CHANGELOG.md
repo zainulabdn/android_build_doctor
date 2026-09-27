@@ -1,3 +1,32 @@
+## 0.2.0
+
+A redesigned terminal experience.
+
+- Every command has a new look: titled rounded panels, `ERROR` / `WARN` /
+  `INFO` badges, a toolchain panel in `check`, an AGP 9 readiness meter in
+  `plugins`, culprit, cause and numbered fix steps in `explain`, and a plan
+  plus line-numbered diffs in `fix`. Each report ends with a card that sums
+  it up and says what to run next.
+- Colours were picked by measuring contrast: every status colour keeps at
+  least 3:1 on white, Solarized Light and four dark themes, and a test guards
+  it. Text stays in the terminal's own colours.
+- 24-bit, 256- and 16-colour terminals are detected (`COLORTERM`, `TERM`,
+  `TERM_PROGRAM`, `WT_SESSION`); `NO_COLOR` and `FORCE_COLOR` are honoured.
+  `--ci` and Windows consoles still get plain ASCII.
+- A spinner shows progress while Flutter, the matrix and pub.dev are queried,
+  on interactive terminals only.
+- `explain` marks notices from a build that succeeded (GE012, GE013) as
+  warnings. `errors.yaml` entries accept an optional `severity`, and
+  `explain --json` includes it.
+- Fixed: `fix --json` now prints exactly one JSON document. It applies changes
+  only with `--yes` (it cannot ask), reports the backup and `--verify` result
+  in the same document, and its diffs contain no colour codes.
+- README and pub.dev screenshots, rendered from the real output by
+  `tool/screenshots.dart`.
+- Library: new `Painter`, `Glyphs`, `Tones`, `ColorDepth` and the
+  `PluginsReporter`, `ExplainReporter`, `FixReporter` and `MatrixReporter`
+  views; `Ansi` gained colour depths and `ConsoleReporter` a `width`.
+
 ## 0.1.0
 
 Initial release.

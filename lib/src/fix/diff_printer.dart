@@ -1,7 +1,52 @@
 import '../output/ansi.dart';
 
-/// Produces a unified diff between two texts (line-based, 3 lines of
-/// context). Good enough for the handful of single-line edits `fix` makes.
+/// One line of a diff: unchanged (`' '`), removed (`'-'`) or added (`'+'`).
+class DiffLine {
+  /// Creates a diff line.
+  const DiffLine(this.op, this.text, {this.oldLine, this.newLine});
+
+  /// `' '`, `'-'` or `'+'`.
+  final String op;
+
+  /// The line's text, without the line break.
+  final String text;
+
+  /// 1-based line number in the old text (`null` for added lines).
+  final int? oldLine;
+
+  /// 1-based line number in the new text (`null` for removed lines).
+  final int? newLine;
+}
+
+/// A run of changed lines with their surrounding context.
+class DiffHunk {
+  /// Creates a hunk.
+  const DiffHunk({
+    required this.oldStart,
+    required this.oldCount,
+    required this.newStart,
+    required this.newCount,
+    required this.lines,
+  });
+
+  /// 1-based first old line covered by the hunk.
+  final int oldStart;
+
+  /// Number of old lines in the hunk.
+  final int oldCount;
+
+  /// 1-based first new line covered by the hunk.
+  final int newStart;
+
+  /// Number of new lines in the hunk.
+  final int newCount;
+
+  /// The hunk's lines, in order.
+  final List<DiffLine> lines;
+}
+
+/// Line-based diffs (LCS, 3 lines of context). Good enough for the handful
+/// of single-line edits `fix` makes.
 class DiffPrinter {
   /// Creates a printer.
   DiffPrinter(this.ansi);
@@ -11,28 +56,61 @@ class DiffPrinter {
 
   /// Unified diff of `before` → `after` for `displayPath`.
   String unified(String displayPath, String before, String after) {
-    final a = _lines(before);
-    final b = _lines(after);
-    final ops = _diff(a, b);
     final buf = StringBuffer()
       ..writeln(ansi.bold('--- a/$displayPath'))
       ..writeln(ansi.bold('+++ b/$displayPath'));
+    for (final h in hunks(before, after)) {
+      buf.writeln(
+        ansi.cyan(
+          '@@ -${h.oldStart},${h.oldCount} +${h.newStart},${h.newCount} @@',
+        ),
+      );
+      for (final l in h.lines) {
+        final line = '${l.op}${l.text}';
+        buf.writeln(switch (l.op) {
+          '+' => ansi.green(line),
+          '-' => ansi.red(line),
+          _ => line,
+        });
+      }
+    }
+    return buf.toString();
+  }
 
-    // Group changes into hunks with 3 lines of context.
-    const ctx = 3;
+  /// The hunks that turn `before` into `after`, with `context` unchanged
+  /// lines around each change. Changes separated by up to twice the context
+  /// share a hunk.
+  static List<DiffHunk> hunks(String before, String after, {int context = 3}) {
+    final ops = _diff(_lines(before), _lines(after));
+    final numbered = <DiffLine>[];
+    var oldLine = 0, newLine = 0;
+    for (final (op, text) in ops) {
+      if (op != '+') oldLine++;
+      if (op != '-') newLine++;
+      numbered.add(
+        DiffLine(
+          op,
+          text,
+          oldLine: op == '+' ? null : oldLine,
+          newLine: op == '-' ? null : newLine,
+        ),
+      );
+    }
+
+    final out = <DiffHunk>[];
     var i = 0;
     while (i < ops.length) {
       if (ops[i].$1 == ' ') {
         i++;
         continue;
       }
-      var start = i;
+      final start = i;
       var end = i;
       while (end < ops.length) {
-        // extend to include changes within 2*ctx of each other
+        // Extend to include changes within 2 * context of each other.
         var j = end + 1;
         var gap = 0;
-        while (j < ops.length && ops[j].$1 == ' ' && gap < 2 * ctx) {
+        while (j < ops.length && ops[j].$1 == ' ' && gap < 2 * context) {
           j++;
           gap++;
         }
@@ -42,38 +120,26 @@ class DiffPrinter {
           break;
         }
       }
-      // find last change index within [start, end]
-      var lastChange = end;
-      while (lastChange > start && ops[lastChange].$1 == ' ') {
-        lastChange--;
-      }
-      final hunkStart = (start - ctx).clamp(0, ops.length);
-      final hunkEnd = (lastChange + ctx + 1).clamp(0, ops.length);
-      var aLine = 0, bLine = 0;
+      final hunkStart = (start - context).clamp(0, ops.length);
+      final hunkEnd = (end + context + 1).clamp(0, ops.length);
+      var oldBefore = 0, newBefore = 0;
       for (var k = 0; k < hunkStart; k++) {
-        if (ops[k].$1 != '+') aLine++;
-        if (ops[k].$1 != '-') bLine++;
+        if (ops[k].$1 != '+') oldBefore++;
+        if (ops[k].$1 != '-') newBefore++;
       }
-      var aCount = 0, bCount = 0;
-      for (var k = hunkStart; k < hunkEnd; k++) {
-        if (ops[k].$1 != '+') aCount++;
-        if (ops[k].$1 != '-') bCount++;
-      }
-      buf.writeln(
-        ansi.cyan('@@ -${aLine + 1},$aCount +${bLine + 1},$bCount @@'),
+      final lines = numbered.sublist(hunkStart, hunkEnd);
+      out.add(
+        DiffHunk(
+          oldStart: oldBefore + 1,
+          oldCount: lines.where((l) => l.op != '+').length,
+          newStart: newBefore + 1,
+          newCount: lines.where((l) => l.op != '-').length,
+          lines: lines,
+        ),
       );
-      for (var k = hunkStart; k < hunkEnd; k++) {
-        final (op, text) = ops[k];
-        final line = '$op$text';
-        buf.writeln(switch (op) {
-          '+' => ansi.green(line),
-          '-' => ansi.red(line),
-          _ => line,
-        });
-      }
       i = hunkEnd;
     }
-    return buf.toString();
+    return out;
   }
 
   static List<String> _lines(String s) {
